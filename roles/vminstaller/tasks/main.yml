@@ -1,0 +1,123 @@
+- name: remove old SSH key if any
+  become: no
+  local_action: known_hosts name="{{ inventory_hostname }}" state=absent
+
+- name: set machine arch variables ({{ machinearch }})
+  include_vars: "{{ machinearch }}/console.yml"
+  when: virtconsole is not defined
+
+- name: set distribution variables ({{ distro }})
+  include_vars: "{{ distro }}.yml"
+
+#- name: create the qemu disk images
+#  command: "qemu-img create -f qcow2 '{{ item.path }}' {{ item.size }}"
+#  with_items: "{{ disks }}"
+#  delegate_to: "{{ hyper }}"
+#  when: disks is defined
+
+###
+
+### PowerEL 7
+- name: start distribution installation - PEL7
+  include_tasks: install-vm-pel7.yml
+  when: templatetype == 'pel7'
+
+### EL 7
+- name: start distribution installation - EL7
+  include_tasks: install-vm-el7.yml
+  when: templatetype == 'el7'
+
+### EL 6
+- name: start distribution installation - EL6
+  include_tasks: install-vm-el6.yml
+  when: templatetype == 'el6'
+
+### FEDORA
+- name: start distribution installation - FEDORA
+  include_tasks: install-vm-fedora.yml
+  when: templatetype == 'fedora'
+
+### Debians
+- name: start distribution installation - DEBIAN
+  include_tasks: install-vm-debian.yml
+  when: templatetype == 'debian'
+
+### UBUNTU
+- name: start distribution installation - UBUNTU
+  include_tasks: install-vm-ubuntu.yml
+  when: templatetype == 'ubuntu'
+
+### OPENBSD
+- name: start distribution installation - OPENBSD
+  include_tasks: install-vm-openbsd.yml
+  when: templatetype == 'openbsd'
+
+### FREEBSD
+- name: start distribution installation - FREEBSD
+  include_tasks: install-vm-freebsd.yml
+  when: templatetype == 'freebsd'
+
+### OPENSUSE
+- name: start distribution installation - OEPNSUSE
+  include_tasks: install-vm-opensuse.yml
+  when: templatetype == "opensuse"
+
+### WIN SRV 16
+- name: start distribution installation - WINSRV16
+  include_tasks: install-vm-winsrv2016.yml
+  when: templatetype == 'winsrv2016'
+
+#- name: start distribution installation - WINSRV12
+#  include: install-vm-winsrv2012.yml
+#  when: templatetype == 'winsrv2012'
+
+#- name: start distribution installation - WINSRV08
+#  include: install-vm-winsrv2008.yml
+#  when: templatetype == 'winsrv2008'
+
+#- name: start distribution installation - WIN7
+#  include: install-vm-win7.yml
+#  when: templatetype == 'win7'
+
+# SLES
+# OPENSUSE
+# GENTOO
+# FREEBSD
+
+- name: execute minimum ram hack where required
+  include_tasks: minimum-ram-hack.yml
+  when: minram is defined
+
+- name: start the vm
+  virt:
+    guest: "{{ inventory_hostname_short }}"
+    command: start
+  delegate_to: "{{ hyper }}"
+  ignore_errors: yes
+
+- name: clean up files
+  file:
+    path: "{{ item }}"
+    state: absent
+  delegate_to: "{{ hyper }}"
+  with_items:
+    - "{{ virtualfilespath }}{{ inventory_hostname }}-create-vm.sh"
+    #- "{{ virtualfilespath }}{{ injectfile }}"
+    - "{{ virtualfilespath }}{{ inventory_hostname }}.cfg"
+    - "{{ virtualfilespath }}{{ inventory_hostname }}-create-disks.sh"
+    - "{{ virtualfilespath }}{{ inventory_hostname }}-minram.sh"
+    - "{{ virtualfilespath }}{{ inventory_hostname }}-create-vm.sh"
+    - "{{ virtualfilespath }}{{ inventory_hostname }}-autounattend.xml"
+    - "{{ virtualfilespath }}{{ inventory_hostname }}-create-autounattend-disk.sh"
+    #- "{{ virtualfilespath }}{{ inventory_hostname }}-autounattend-disk.vusb"
+
+- name: wait for vm to become available
+  local_action: wait_for host={{ inventory_hostname }} port={{ ansible_port }} delay=5 state=started timeout=300
+  become: no
+
+- name: add SSH host key for new VM to known_hosts
+  local_action: shell ssh-keyscan {{ inventory_hostname }} >>~/.ssh/known_hosts
+  become: no
+
+- name: gather facts
+  setup:

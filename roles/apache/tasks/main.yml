@@ -1,0 +1,10 @@
+---
+- name: install Apache
+  apt:
+    install_recommends: no
+    update_cache: yes
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - apache2
+    - ssl-cert

@@ -1,0 +1,9 @@
+- name: check out {{ style.name }} repo
+  git:
+    repo: '{{ style.repo }}'
+    dest: /etc/mapnik-osm-data/{{ style.name }}
+    force: yes
+    version: "{{ style.version }}"
+
+- include: style_common.yaml
+

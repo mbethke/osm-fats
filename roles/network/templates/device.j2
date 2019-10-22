@@ -1,0 +1,15 @@
+auto {{ item.device }}
+{% set have_bootproto = [] %}
+{% if item.ips is defined %}
+{% set have_bridge = [] %}
+{% for inet in ['inet', 'inet6'] %}
+{% include inet + '.j2' %}
+{% endfor %}
+{% endif %}
+{% if 1 > have_bootproto|length %}
+{% set inet = 'inet' %}
+{% include 'iface.j2' %}
+{% if item.type is defined and item.type|lower == "bridge" and not have_bridge %}
+{% include 'bridge.j2' %}
+{% endif %}
+{% endif %}

@@ -1,0 +1,32 @@
+- name: enable Apache modules
+  apache2_module: name={{ item }}
+  with_items: [ ssl , tile ]
+  notify: [ restart_apache ]
+
+- name: disable CGI config
+  file: name=/etc/apache2/conf-enabled/serve-cgi-bin.conf state=absent
+  notify: [ restart_apache ]
+
+- name: install new security.conf
+  copy: src=security.conf dest=/etc/apache2/conf-available/ owner=root group=root mode=0644 force=yes
+  notify: [ restart_apache ]
+
+- name: template vhost config
+  template: dest=/etc/apache2/sites-available/{{ website }}.conf src=vhost owner=root group=root mode=644
+  notify: [ restart_apache ]
+
+- name: create webroot
+  file: path=/var/www/{{ website }} state=directory owner=osm group=osm mode=755
+
+- name: disable default tile site
+  command: a2dissite tileserver_site
+  args:
+    removes: /etc/apache2/sites-enabled/tileserver_site.conf
+  notify: [ restart_apache ]
+
+- name: enable site
+  command: a2ensite {{ website }}
+  args:
+    creates: /etc/apache2/sites-enabled/{{ website }}.conf
+  notify: [ restart_apache ]
+

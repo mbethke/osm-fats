@@ -1,0 +1,5 @@
+- name: add OSM user
+  user: name={{ osm_username }} append=yes state=present createhome=yes shell=/bin/bash
+
+- name: Set up authorized keys for user {{ osm_username }}
+  authorized_key: user={{ osm_username }} key="{{ sshpubkey }}"

@@ -1,0 +1,30 @@
+
+{% set ips = item.ips | ipv6 %}
+{% if ips|length > 0 %}
+{% include 'iface.j2' %}
+{% if item.type is defined and item.type|lower == "bridge" and not have_bridge %}
+{% include 'bridge.j2' %}
+{% endif %}
+  address     {{ ips[0] | ipaddr('host/prefix') }}
+{% if item.gws is defined %}
+{% set gws = item.gws | ipv6 %}
+{% if gws|length > 0 %}
+  gateway     {{ gws[0] | ipaddr('address') }}
+{% endif %}
+{% endif %}
+{% if item.accept_ra is defined %}
+  accept_ra   {{ item.accept_ra }}
+{% endif %}
+{% if item.dhcp is defined %}
+  dhcp  {{ item.dhcp }}
+{% endif %}
+{% if ips|length > 1 %}
+{% for ip in ips[1:] %}
+  post-up     ip -6 addr add {{ ip }} dev {{ item.device }}
+{% endfor %}
+{% endif %}
+{% endif %}
+{% if item.routes is defined and gws|length > 0 %}
+{% set routes = item.routes | ipv6 %}
+{% include 'routes.j2' %}
+{% endif %}

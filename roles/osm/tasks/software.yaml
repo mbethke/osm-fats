@@ -1,0 +1,59 @@
+- name: add OSM PPA
+  apt_repository:
+    repo: ppa:mbethke/osm
+
+- name: install PostgreSQL-11 extensions
+  apt:
+    install_recommends: no
+    update_cache: no
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - postgresql-plperl-11
+    - postgresql-plpython3-11
+    - postgresql-11-postgis-2.5
+    - postgresql-11-postgis-2.5-scripts
+  when: use_postgresql_11
+
+- name: install PostgreSQL extensions
+  apt:
+    install_recommends: no
+    update_cache: no
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - postgresql-plperl
+    - postgresql-plpython3
+    - postgresql-10-postgis-2.4
+    - postgresql-10-postgis-2.4-scripts
+  when: not use_postgresql_11
+
+- name: install packages required for OSM
+  apt:
+    install_recommends: no
+    update_cache: no
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - bzip2
+    - libgeotiff-epsg
+    - libtool
+    - lua5.1
+    - ttf-unifont
+    - unzip
+    - wget
+    - imposm
+    - osm2pgsql
+    - mapnik-vector-tile
+    - libgeos++-dev
+    - gdal-bin
+    - mapnik-utils
+    - python-mapnik
+    - python3-mapnik
+    - renderd
+    - libapache2-mod-tile
+    - ttf-dejavu
+    - ttf-dejavu-extra
+    - npm
+    - libyaml-libyaml-perl
+

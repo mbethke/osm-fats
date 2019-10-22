@@ -1,0 +1,33 @@
+---
+distroname: ubuntu1804
+distrotype: ubuntu15.04
+distrocodename: bionic
+templatetype: ubuntu
+minram: 1024
+injectfile: preseed.cfg
+#location: http://be.ports.ubuntu.com/ubuntu-ports/dists/{{ distrocodename }}/main/installer-{{ machinearch }}/
+#location: http://be.archive.ubuntu.com/ubuntu/dists/{{ distrocodename }}/main/installer-{{ machinearch }}/
+#location: http://be.archive.ubuntu.com/ubuntu/dists/xenial/main/installer-{{ machinearch }}/
+#location: http://be.ports.ubuntu.com/ubuntu-ports/dists/{{ distrocodename }}/main/installer-{{ machinearch }}/
+#location: http://ftp.fau.de/ubuntu-ports/dists/trusty/main/installer-ppc64el/
+#location: http://be.ports.ubuntu.com/ubuntu-ports/dists/{{ distrocodename }}/main/installer-{{ machinearch }}/
+#location: http://be.ports.ubuntu.com/ubuntu-ports/dists/xenial/main/installer-{{ machinearch }}/
+###
+#location: http://be.archive.ubuntu.com/ubuntu/dists/{{ distrocodename }}/main/installer-{{ machinearch }}/
+#location: http://be.ports.ubuntu.com/ubuntu-ports/dists/{{ distrocodename }}/main/installer-{{ machinearch }}/
+location: http://ftp.uni-stuttgart.de/ubuntu/dists/bionic/main/installer-amd64/
+#mirrorcountry: be
+mirrorcountry: de
+#mirrortype: ports
+mirrortype: archive
+#mirrorurl: be.archive.ubuntu.com
+mirrorurl: http://ftp.uni-stuttgart.de/ubuntu/
+#mirrorurl: archive.ubuntu.com
+#mirrorurl: be.ports.ubuntu.com
+#mirrorurl: ports.ubuntu.com
+#mirrorurl: ftp.fau.de
+mirrordir: /ubuntu/
+#mirrordir: /ubuntu-ports/
+#mirrordir: /
+# bug in ntp with ipv6 enabled doesn't allow installer to proceed beyond clock synchro
+textrargs: "auto=true DEBIAN_FRONTEND=text noshell fb=false console={{ serialconsole }},115200 lowmem netcfg/disable_autoconfig=true biosdevname=0 net.ifnames=0 BOOT_DEBUG=2"

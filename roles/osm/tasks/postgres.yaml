@@ -1,0 +1,63 @@
+- name: make sure PostgreSQL is running
+  service: name=postgresql state=started
+
+- name: tune server parameters
+  postgresql_set: name={{ item.key }} value={{ item.value }}
+  loop: "{{ psql_tuning | dict2items }}"
+  become: yes
+  become_user: postgres
+  notify: restart_postgresql
+
+- name: create DB user
+  postgresql_user:
+    name: "{{ osm_username }}"
+    encrypted: yes
+    password: "{{ db_password }}"
+  become: yes
+  become_user: postgres
+
+- name: create DB
+  postgresql_db:
+    name: "{{ gis_dbname }}"
+    owner: "{{ osm_username }}"
+    encoding: UTF8
+    lc_ctype: en_US.UTF8
+    lc_collate: en_US.UTF8
+    template: template0
+  become: yes
+  become_user: postgres
+
+- name: add PostgreSQL extensions
+  become: yes
+  become_user: postgres
+  postgresql_ext: db={{ gis_dbname }} cascade=yes name="{{ item }}"
+  with_items: [ postgis , hstore ]
+
+- name: add PostgreSQL languages
+  become: yes
+  become_user: postgres
+  postgresql_lang: lang={{ item }} db={{ gis_dbname }}
+  with_items: [ plpython3u , plperl ]
+
+- name: alter some table ownerships
+  become: yes
+  become_user: postgres
+  postgresql_owner:
+    db: "{{ gis_dbname }}"
+    obj_type: table
+    obj_name: "{{ item }}"
+    new_owner: "{{ osm_username }}"
+  with_items: [ geometry_columns , spatial_ref_sys ]
+
+- name: tune sysctl
+  lineinfile:
+    dest: /etc/sysctl.conf
+    state: present
+    regexp: "^{{ item.key }}"
+    line: "{{ item.key }}={{item.value}}"
+  with_items: "{{ sysctl | dict2items }}"
+  vars:
+    sysctl:
+      vm.nr_hugepages: 4300 # TODO adapt to memory
+      vm.overcommit_memory: 2
+

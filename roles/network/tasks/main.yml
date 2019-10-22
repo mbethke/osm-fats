@@ -1,0 +1,48 @@
+- name: Install network packages
+  apt:
+    install_recommends: no
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - bridge-utils
+    - ethtool
+
+- name: Configure bridging stuff
+  file:
+    state: link
+    src: "/lib/bridge-utils/ifupdown.sh"
+    path: "/etc/network/if-{{ item }}.d/bridge"
+  with_items: [ post-down, pre-up ]
+  
+- name: Install /etc/network/interfaces
+  copy:
+    src: interfaces
+    dest: /etc/network/interfaces
+    mode: 0644
+
+- name: Template network device files
+  template:
+    src: device.j2
+    dest: "/etc/network/interfaces.d/{{ item.device }}"
+    mode: 0644
+  with_items: "{{network}}"
+
+#- name: Cleanup extraneous device files
+#  file:
+#    dest: "/etc/network/interfaces.d/{{ item }}"
+#    state: absent
+#  with_items: "{{ansible_interfaces}}"
+#  when: item not in "{{ network|map(attribute='device')|list }}"
+
+  # get wanted permanently configured static routes
+  # ignore errors as file may not exist
+  # must be done before we template the file
+#- name: register permanent system routes
+#  command: cat {{ network_conf_path }}/route-{{ item.device }}
+#  with_items: "{{network}}"
+#  ignore_errors: true
+#  check_mode: no
+#  register: network_permanent_routes
+#  when: ansible_os_family != "Debian"
+
+# - debug: var=network_permanent_routes.results

@@ -1,0 +1,62 @@
+- name: "Install hypervisor packages"
+  apt:
+    install_recommends: no
+    update_cache: yes
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - qemu-kvm
+    - libvirt-daemon
+    - libvirt-doc
+    - libvirt-clients
+    - virt-goodies
+    - virtinst
+    - virt-top
+    - radvd
+    - bridge-utils
+    - ethtool
+
+- name: "Remove superfluous packages"
+  apt:
+    state: absent
+    purge: yes
+    autoremove: yes
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - libavfilter7
+
+- name: "Configure sysctl"
+  template:
+    src: sysctl.conf
+    dest: /etc/sysctl.conf
+    force: yes
+    mode: '644'
+
+- name: Check libvirt pool
+  command: "virsh pool-info virtimages"
+  register: virtimages_result
+  ignore_errors: true
+
+- name: "Create libvirt pool"
+  when: virtimages_result is failed
+  command: "virsh pool-create /dev/stdin"
+  args:
+    stdin: |
+           <pool type='dir'>
+             <name>virtimages</name>
+             <target>
+               <path>/var/lib/libvirt/images</path>
+               <permissions>
+                 <mode>0711</mode>
+                 <owner>0</owner>
+                 <group>0</group>
+               </permissions>
+             </target>
+           </pool>
+
+- include: network.yml
+
+- name: "Activate radvd"
+  command: "systemctl enable radvd"
+

@@ -1,0 +1,8 @@
+{% if inet == 'inet' %}
+{% set cmd = 'ip' %}
+{% elif inet == 'inet6' %}
+{% set cmd = 'ip -6' %}
+{% endif %}
+{% for route in routes %}
+  post-up {{ cmd }} route add {{ route }} via {{ gws[0] }} dev {{ item.device }}
+{% endfor %}

@@ -1,0 +1,18 @@
+- name: add Postgresql repo
+  apt_repository:
+    repo: "deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main"
+    update_cache: no
+  when: use_postgresql_11
+
+- name: add repo signing key
+  apt_key:
+    id: ACCC4CF8
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+  when: use_postgresql_11
+
+- name: install Postgresql server
+  apt:
+    install_recommends: no
+    update_cache: yes
+    name: postgresql,postgresql-contrib,libdbd-pg-perl
+  notify: restart_postgresql

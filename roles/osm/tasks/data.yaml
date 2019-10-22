@@ -1,0 +1,34 @@
+- name: create data dir
+  file:
+    path: /var/tmp/osm
+    state: directory
+    mode: '755'
+  become: yes
+  become_user: "{{ osm_username }}"
+
+- name: download regions
+  command: "wget -c https://download.geofabrik.de/{{ item }}-latest.osm.pbf"
+  args:
+    chdir: /var/tmp/osm
+    warn: false
+  become: yes
+  become_user: "{{ osm_username }}"
+  with_items: "{{ download_regions }}"
+  when: not download_planet
+
+- name: download planet
+  command: "wget -c {{ planet_url }}"
+  args:
+    chdir: /var/tmp/osm
+    warn: false
+  become: yes
+  become_user: "{{ osm_username }}"
+  when: download_planet
+
+- name: install import script
+  template:
+    src: import.sh
+    dest: '~'
+    mode: '755'
+  become: yes
+  become_user: "{{ osm_username }}"

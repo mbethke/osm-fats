@@ -1,0 +1,12 @@
+---
+distroname: debian10
+distrotype: debian10
+debianname: buster
+templatetype: debian
+minram: 256
+injectfile: preseed.cfg
+location: http://ftp.be.debian.org/debian/dists/{{ debianname }}/main/installer-{{ machinearch }}/
+mirrorcountry: be
+mirrorurl: ftp.be.debian.org
+mirrordir: /debian
+textrargs: "auto=true DEBIAN_FRONTEND=text noshell fb=false console=hvc0,115200 lowmem BOOT_DEBUG=2"

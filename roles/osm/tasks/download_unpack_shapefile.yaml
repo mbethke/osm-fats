@@ -1,0 +1,13 @@
+- name: download shapefile: {{ shapefile }}
+  shell: 'wget https://bodega.towiski.de/shapefiles/{{ shapefile }}-polygons-reduced-3857.zip'
+  args:
+    chdir: /etc/mapnik-osm-data/carto/data/
+    warn: false
+    creates: '/etc/mapnik-osm-data/carto/data/{{ shapefile }}-polygons-reduced-3857.zip'
+
+- name: unpack shapefile: {{ shapefile }}
+  shell: 'unzip {{ shapefile }}-polygons-reduced-3857.zip'
+  args:
+    chdir: /etc/mapnik-osm-data/carto/data/
+    creates: '/etc/mapnik-osm-data/carto/data/{{ shapefile }}-polygons-reduced-3857/{{ shapefile }}_reduced_z6.shx'
+

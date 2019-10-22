@@ -1,0 +1,41 @@
+- name: install extra packages for carto-de
+  apt:
+    install_recommends: no
+    update_cache: no
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - postgresql-10-osml10n
+    - fonts-noto-cjk
+    - fonts-noto-hinted
+    - fonts-noto-unhinted
+    - fonts-hanazono
+
+- name: add carto-de specific PostgreSQL extension
+  become: yes
+  become_user: postgres
+  postgresql_ext: db={{ gis_dbname }} cascade=yes name=osml10n
+
+- name: check out carto-de repo
+  git:
+    repo: 'https://github.com/giggls/openstreetmap-carto-de.git'
+    dest: /etc/mapnik-osm-data/{{ style.name }}
+    force: yes
+    # version: "{{ style.version }}" currently broken, use HEAD
+
+- include: style_common.yaml
+
+# Workaround for shape files unavailable from upstream
+# see https://github.com/giggls/openstreetmap-carto-de/issues/41
+- include: download_unpack_shapefile.yaml
+  with_items: [ lakes , ocean , river ]
+  loop_control:
+    loop_var: shapefile
+
+- name: create post-import view setup script
+  template:
+    src: postimport-carto_de.sh
+    dest: ~/post-import.sh
+    mode: 755
+  become: yes
+  become_user: "{{ osm_username }}"

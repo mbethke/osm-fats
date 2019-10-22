@@ -1,0 +1,34 @@
+- name: create post preseed installation file from templated file
+  template:
+    src: "ubuntu/post-preseed.sh"
+    dest: "{{ virtualfilespath }}vminstall_post_preseed_{{ inventory_hostname }}.sh"
+    owner: root
+    group: root
+    mode: 0750
+  delegate_to: "{{ hyper }}"
+
+- name: create preseed installation file from templated file
+  template:
+      src: "ubuntu/minimal-preseed.cfg"
+      dest: "{{ virtualfilespath }}{{ injectfile }}"
+      owner: root
+      group: root
+      mode: 0660
+  delegate_to: "{{ hyper }}"
+
+- name: copy templated install file
+  template:
+    src: "common/install-vm.sh"
+    dest: "{{ virtualfilespath }}{{ inventory_hostname }}-create-vm.sh"
+    owner: root
+    group: root
+    mode: 0770
+  delegate_to: "{{ hyper }}"
+
+- name: execute installation script
+  command: "/bin/bash {{ virtualfilespath }}{{ inventory_hostname }}-create-vm.sh"
+  delegate_to: "{{ hyper }}"
+  register: createdvm
+
+- name: pause and wait for installation
+  local_action: pause minutes={{ vmwaittime }}

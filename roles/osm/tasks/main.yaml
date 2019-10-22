@@ -1,0 +1,20 @@
+---
+- name: create random database password
+  local_action: command pwgen 20 1
+  become: no
+  register: db_password
+
+- set_fact: 
+    db_password: "{{ db_password.stdout }}"
+
+- include: software.yaml
+- include: user.yaml
+- include: postgres.yaml
+- include: apache.yaml
+  vars:
+    website: "{{ ansible_host }}"
+    webroot: "/var/www/{{ website }}"
+    webadmin: "webmaster@{{ domainname }}"
+- include: renderd.yaml
+- include: carto.yaml
+- include: data.yaml

@@ -1,0 +1,15 @@
+- name: Install network packages
+  apt:
+    install_recommends: no
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - bridge-utils
+    - ethtool
+
+- name: Configure bridging stuff
+  file:
+    state: link
+    src: "/lib/bridge-utils/ifupdown.sh"
+    path: "/etc/network/if-{{ item }}.d/bridge"
+  with_items: [ post-down, pre-up ]

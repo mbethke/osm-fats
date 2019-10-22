@@ -1,0 +1,8 @@
+{% if (item.bootproto is undefined) or (item.bootproto|lower == 'dhcp') %}
+iface {{ item.device }} {{inet}} dhcp
+{% elif (item.bootproto|lower == 'static') %}
+iface {{ item.device }} {{inet}} static
+{% elif (item.bootproto|lower == 'manual' or item.bootproto|lower == 'none') %}
+iface {{ item.device }} {{inet}} manual
+{% endif %}
+{{ have_bootproto.append(1) }}

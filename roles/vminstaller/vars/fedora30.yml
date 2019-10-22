@@ -1,0 +1,11 @@
+---
+distroname: fedora30
+distrotype: fedora23
+templatetype: fedora
+minram: 2048
+location: https://ftp-stud.hs-esslingen.de/pub/fedora-secondary/releases/30/Everything/ppc64le/os/
+repos:
+  - name: "Fedora Everything"
+    uri: https://ftp-stud.hs-esslingen.de/pub/fedora-secondary/releases/30/Everything/ppc64le/os/
+    cost: 100
+textrargs: 'text repo={{ location }} ks=file:/{{ inventory_hostname }}.cfg console={{ serialconsole }},115200 headless noshell nofirewire rd_NO_PLYMOUTH plymouth.enable=0 biosdevname=0 elevator=noop geoloc=0 nopass kdump_addon=off nopcmia'

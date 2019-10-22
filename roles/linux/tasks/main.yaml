@@ -1,0 +1,73 @@
+- name: Install some basic commodities
+  apt:
+    name: "{{ packages }}"
+    install_recommends: no
+    update_cache: yes
+  vars:
+    packages:
+    - apt
+    - aptitude
+    - acl
+    - sudo
+    - vim-nox
+    - vim-pathogen
+    - bash-completion
+    - tmux
+    - zsh
+    - ack
+    - git
+    - msmtp
+    - msmtp-mta
+    - bsd-mailx
+    - logrotate
+    - rsync
+    - bc
+    - apticron
+    - bzip2
+    - pv
+    - iotop
+    - net-tools
+
+- name: Remove superfluous stuff
+  apt:
+    name: "{{ packages }}"
+    state: absent
+  vars:
+    packages:
+    - vim-tiny
+    - nano
+
+- name: Make sure we have a 'wheel' group
+  group: name=wheel state=present
+
+- name: Allow members of 'wheel' passwordless sudo
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%wheel'
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+    validate: visudo -cf %s
+
+- name: "Remove default motd"
+  file:
+    path: /etc/motd
+    state: absent
+
+- name: Configure apticron
+  copy:
+    src: apticron.conf
+    dest: /etc/apticron
+    mode: 0640
+
+- name: configure pageup/pagedown to search history in inputrc
+  lineinfile:
+    path: /etc/inputrc
+    regexp: '^(\s*#\s*)?("\\e\[{{ item }}~": history-search-.*)'
+    line: '\2'
+    backrefs: yes
+  with_items: [ 5 , 6 ]
+
+- name: update locatedb
+  command: /etc/cron.daily/mlocate
+  args:
+    creates: /var/lib/mlocate/mlocate.db

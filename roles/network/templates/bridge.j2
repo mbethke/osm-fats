@@ -1,0 +1,13 @@
+{% if 1 > have_bridge|length %}
+{% if item.bridge_ports is undefined %}
+  bridge_ports none
+{% else %}
+  bridge_ports {{ item.bridge_ports|join(' ') }}
+{% endif %}
+{% if item.bridge_opts is defined %}
+{% for key,value in item.bridge_opts.items() %}
+  {{ key }} {{ value }}
+{% endfor %}
+{% endif %}
+{% endif %}
+{{ have_bridge.append(1) }}
