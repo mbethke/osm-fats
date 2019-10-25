@@ -1,6 +1,7 @@
 - name: add OSM PPA
   apt_repository:
-    repo: ppa:mbethke/osm
+    repo: ppa:osmadmins/ppa
+    update_cache: yes
 
 - name: install PostgreSQL-11 extensions
   apt:
