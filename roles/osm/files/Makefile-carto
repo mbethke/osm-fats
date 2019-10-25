@@ -1,0 +1,2 @@
+osm.xml: project.mml
+	carto -a 3.0.22 $< >$@

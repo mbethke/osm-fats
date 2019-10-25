@@ -1,0 +1,10 @@
+- name: configure renderd {{ section }} params
+  ini_file:
+    path: /etc/renderd.conf
+    section: "{{ section }}"
+    option: "{{ item.key }}"
+    value: "{{ item.value }}"
+    mode: '0640'
+    backup: no
+  loop: "{{ params | dict2items }}"
+  notify: restart_renderd

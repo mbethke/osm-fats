@@ -1,0 +1,7 @@
+- include: renderd_section.yaml
+  vars:
+    section: "{{ style.name }}"
+    params:
+      XML: "/etc/mapnik-osm-data/{{ style.name }}/{{ style_xml }}"
+      TILEDIR: "{{ renderd_tuning.tiledir }}"
+      DESCRIPTION: This is the {{ style.name }} style
