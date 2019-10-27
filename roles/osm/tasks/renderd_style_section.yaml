@@ -2,6 +2,16 @@
   vars:
     section: "{{ style.name }}"
     params:
+      URI: "/{{ style.name }}"
       XML: "/etc/mapnik-osm-data/{{ style.name }}/{{ style_xml }}"
       TILEDIR: "{{ renderd_tuning.tiledir }}"
       DESCRIPTION: This is the {{ style.name }} style
+
+- name: make web dir
+  file: path=/var/www/{{ website }}/{{ style.name }} state=directory owner=osm group=osm mode=755
+
+- name: link per-style slippymap
+  file:
+    path: /var/www/{{ website }}/{{ style.name }}/slippymap.html
+    src: /var/www/{{ website }}/slippymap.html
+    state: link

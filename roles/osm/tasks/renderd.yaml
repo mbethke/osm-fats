@@ -1,3 +1,16 @@
-- name: configure renderd
-  copy: dest=/etc/renderd.conf src=renderd.conf
-  notify: restart_renderd
+- include: renderd_section.yaml
+  vars:
+    section: renderd
+    params:
+      stats_file: /var/run/renderd/renderd.stats
+      socketname: /var/run/renderd/renderd.sock
+      tile_dir: /var/lib/mod_tile
+      num_threads: "{{ renderd_tuning.threads }}"
+
+- include: renderd_section.yaml
+  vars:
+    section: mapnik
+    params:
+      plugins_dir: /usr/lib/mapnik/3.0/input
+      font_dir: /usr/share/fonts/truetype/
+      font_dir_recurse: true

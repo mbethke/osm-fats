@@ -4,7 +4,7 @@
     section: "{{ section }}"
     option: "{{ item.key }}"
     value: "{{ item.value }}"
-    mode: '0640'
+    mode: '0644'
     backup: no
   loop: "{{ params | dict2items }}"
   notify: restart_renderd
