@@ -23,14 +23,19 @@
     force: yes
     # version: "{{ style.version }}" currently broken, use HEAD
 
-- include: style_common.yaml
+- name: download shapefiles
+  shell: 'cd /etc/mapnik-osm-data/{{ style.name }} && scripts/get-shapefiles.py'
+  args:
+    creates: "/etc/mapnik-osm-data/{{ style.name }}/data/antarctica-icesheet-outlines-*/icesheet_outlines.shp"
 
 # Workaround for shape files unavailable from upstream
 # see https://github.com/giggls/openstreetmap-carto-de/issues/41
 - include: download_unpack_shapefile.yaml
   with_items: [ lakes , ocean , river ]
   loop_control:
-    loop_var: shapefile
+    loop_var: shape_file
+  vars:
+    shapefile: "{{ shape_file }}"
 
 - name: create post-import view setup script
   template:
@@ -39,3 +44,20 @@
     mode: 755
   become: yes
   become_user: "{{ osm_username }}"
+
+- name: patch style.mml with database credentials
+  shell: "cd /etc/mapnik-osm-data/{{ style.name }} && mv project.mml project.mml.orig && perl -MYAML::XS=LoadFile,DumpFile -e'$d=LoadFile(q(project.mml.orig));@{$d->{_parts}{osm2pgsql}}{qw(host dbname user password)}=@ARGV;DumpFile(q(project.mml),$d)' localhost {{ gis_dbname }} {{ osm_username }} {{ db_password }}"
+
+- name: compile style.xml
+  shell: "cd /etc/mapnik-osm-data/{{ style.name }} && make"
+  args:
+    creates: "/etc/mapnik-osm-data/{{ style.name }}/style.xml"
+  when: not style.test
+
+- name: compile and test style.xml
+  shell: "cd /etc/mapnik-osm-data/{{ style.name }} && make && make test"
+  args:
+    creates: "/etc/mapnik-osm-data/{{ style.name }}/style.xml"
+  when: style.test
+
+- include: renderd_style_section.yaml style_xml=osm-de.xml
