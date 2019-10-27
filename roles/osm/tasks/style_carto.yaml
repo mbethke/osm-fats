@@ -1,9 +1,26 @@
-- name: check out {{ style.name }} repo
+- name: check out carto repo
   git:
-    repo: '{{ style.repo }}'
+    repo: 'https://github.com/gravitystorm/openstreetmap-carto.git'
     dest: /etc/mapnik-osm-data/{{ style.name }}
     force: yes
     version: "{{ style.version }}"
 
-- include: style_common.yaml
+- name: download shapefiles
+  shell: 'cd /etc/mapnik-osm-data/{{ style.name }} && scripts/get-shapefiles.py'
+  args:
+    creates: "/etc/mapnik-osm-data/{{ style.name }}/data/antarctica-icesheet-outlines-*/icesheet_outlines.shp"
 
+- name: patch style.mml with database credentials
+  shell: "cd /etc/mapnik-osm-data/{{ style.name }} && mv project.mml project.mml.orig && perl -MYAML::XS=LoadFile,DumpFile -e'$d=LoadFile(q(project.mml.orig));@{$d->{_parts}{osm2pgsql}}{qw(host dbname user password)}=@ARGV;DumpFile(q(project.mml),$d)' localhost {{ gis_dbname }} {{ osm_username }} {{ db_password }}"
+
+- name: copy Makefile
+  copy:
+    src: Makefile-carto
+    dest: /etc/mapnik-osm-data/{{ style.name }}/Makefile
+
+- name: compile style.xml
+  shell: "cd /etc/mapnik-osm-data/{{ style.name }} && make"
+  args:
+    creates: "/etc/mapnik-osm-data/{{ style.name }}/osm.xml"
+
+- include: renderd_style_section.yaml style_xml=osm.xml
