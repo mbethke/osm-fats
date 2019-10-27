@@ -40,11 +40,15 @@
     sshpubkey: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
     gis_dbname: gis
     osm_username: osm
+    website: "{{ ansible_host }}"
     styles:
       - name: carto-de
         #version: 'v4.23.0'
         #version: 'v4.23.0-split'
         default_language: en
+        test: yes
+      - name: carto
+        version: 'v4.23.0'
     download_planet: no
     download_regions: [ asia/laos , asia/sri-lanka ]
     planet_url: 'https://download.bbbike.org/osm/planet/planet-latest.osm.pbf'
@@ -68,3 +72,6 @@
       autovacuum: on
       autovacuum_max_workers: 1
       autovacuum_naptime: 30min
+    renderd_tuning:
+      threads: 4
+      tiledir: /var/lib/mod_tile

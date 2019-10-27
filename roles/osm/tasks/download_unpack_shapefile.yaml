@@ -1,16 +1,14 @@
 ---
-- debug: msg="SHAPE={{shapefile}}"
-
 - name: 'download shapefile - {{ shapefile }}'
   command: 'wget https://bodega.towiski.de/shapefiles/{{ shapefile }}-polygons-reduced-3857.zip'
   args:
-    chdir: /etc/mapnik-osm-data/carto/data/
+    chdir: /etc/mapnik-osm-data/{{ style.name }}/data/
     warn: false
-    creates: '/etc/mapnik-osm-data/carto/data/{{ shapefile }}-polygons-reduced-3857.zip'
+    creates: '/etc/mapnik-osm-data/{{ style.name }}/data/{{ shapefile }}-polygons-reduced-3857.zip'
 
 - name: 'unpack shapefile - {{ shapefile }}'
   command: 'unzip {{ shapefile }}-polygons-reduced-3857.zip'
   args:
-    chdir: /etc/mapnik-osm-data/carto/data/
-    creates: '/etc/mapnik-osm-data/carto/data/{{ shapefile }}-polygons-reduced-3857/{{ shapefile }}_reduced_z6.shx'
+    chdir: /etc/mapnik-osm-data/{{ style.name }}/data/
+    creates: '/etc/mapnik-osm-data/{{ style.name }}/data/{{ shapefile }}-polygons-reduced-3857/{{ shapefile }}_reduced_z6.shx'
 
