@@ -18,6 +18,18 @@
 - name: create webroot
   file: path=/var/www/{{ website }} state=directory owner=osm group=osm mode=755
 
+- name: link slippymap
+  file:
+    dest: "/var/www/{{ website }}/slippymap.html"
+    src:  "/var/www/osm/slippymap.html"
+    state: link
+
+- name: disable default site
+  command: a2dissite 000-default
+  args:
+    removes: /etc/apache2/sites-enabled/000-default.conf
+  notify: [ restart_apache ]
+
 - name: disable default tile site
   command: a2dissite tileserver_site
   args:
