@@ -40,8 +40,8 @@
 - name: create post-import view setup script
   template:
     src: postimport-carto_de.sh
-    dest: ~/post-import.sh
-    mode: 755
+    dest: ~/post-import.d/carto-de.sh
+    mode: '755'
   become: yes
   become_user: "{{ osm_username }}"
 
@@ -52,12 +52,5 @@
   shell: "cd /etc/mapnik-osm-data/{{ style.name }} && make"
   args:
     creates: "/etc/mapnik-osm-data/{{ style.name }}/style.xml"
-  when: not style.test
-
-- name: compile and test style.xml
-  shell: "cd /etc/mapnik-osm-data/{{ style.name }} && make && make test"
-  args:
-    creates: "/etc/mapnik-osm-data/{{ style.name }}/style.xml"
-  when: style.test
 
 - include: renderd_style_section.yaml style_xml=osm-de.xml
