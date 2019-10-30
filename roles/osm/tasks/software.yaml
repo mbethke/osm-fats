@@ -1,12 +1,13 @@
-- name: add OSM PPA
+- name: add PPAs
   apt_repository:
-    repo: ppa:osmadmins/ppa
-    update_cache: yes
+    repo: "ppa:{{ item }}"
+    update_cache: no
+  with_items: [ mbethke/osm , osmadmins/ppa ]
 
 - name: install PostgreSQL-11 extensions
   apt:
     install_recommends: no
-    update_cache: no
+    update_cache: yes
     name: "{{ packages }}"
   vars:
     packages:
@@ -19,7 +20,7 @@
 - name: install PostgreSQL extensions
   apt:
     install_recommends: no
-    update_cache: no
+    update_cache: yes
     name: "{{ packages }}"
   vars:
     packages:
