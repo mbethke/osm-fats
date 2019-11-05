@@ -14,3 +14,10 @@
       plugins_dir: /usr/lib/mapnik/3.0/input
       font_dir: /usr/share/fonts/truetype/
       font_dir_recurse: true
+
+- name: remove renderd default section
+  ini_file:
+    path: /etc/renderd.conf
+    section: default
+    state: absent
+  notify: restart_renderd
