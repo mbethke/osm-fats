@@ -1,10 +1,14 @@
 - name: create random database password
   local_action: command pwgen 20 1
   become: no
-  register: db_password
+  register: random_password
+  when: not osm_psql_password
 
-- set_fact: 
-    db_password: "{{ db_password.stdout }}"
+- debug: msg="Generated random password for PostgreSQL osm user '{{ random_password.stdout }}'"
+  when: not osm_psql_password
+
+- set_fact: osm_psql_password={{ random_password.stdout }}
+  when: not osm_psql_password
 
 - include: software.yaml
 - include: user.yaml

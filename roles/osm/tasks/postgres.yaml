@@ -12,7 +12,7 @@
   postgresql_user:
     name: "{{ osm_username }}"
     encrypted: yes
-    password: "{{ db_password }}"
+    password: "{{ osm_psql_password }}"
   become: yes
   become_user: postgres
 
