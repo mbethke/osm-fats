@@ -8,14 +8,16 @@ if [ $# -lt 1 ]; then
 fi
 
 cd /etc/mapnik-osm-data/carto-de
+mode='create'
 for f in "$@"; do
     flatnodes=''
     [[ "$f" =~ .*/planet-.* ]] && flatnodes="--flat-nodes /var/tmp/flatnodes"
-    time osm2pgsql --create --slim \
+    osm2pgsql --$mode --slim \
         --multi-geometry --style hstore-only.style \
         --tag-transform-script openstreetmap-carto.lua \
         --database gis --unlogged --number-processes={{ virtualcpus - 2 }} --hstore -p planet_osm_hstore \
         $flatnodes "$f"
+    mode='append'
 done
 
 echo "Running post-import scripts"
@@ -25,5 +27,5 @@ for script in ~/post-import.d/*; do
             continue
         }
     echo "${script#*/}"
-    $script
+    time $script
 done
