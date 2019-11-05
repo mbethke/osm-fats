@@ -23,12 +23,14 @@ but `hosts` is found in the `vars` section):
   take an array but only a single hostname makes sense here.
 * `hyper`: the hypervisor that is supposed to run this VM.
 * `hostname` and `domainname`: just like `hosts`
+* `name`, `ip`, `netmask`, `gateway`, `nameserver` and `mac` under `nics`.
+  `name` is the name of the bridge on the hypervisor to connect the VM's `eth0`
+  interface to; everything else should be obvious. If you have a different kind
+  of network configuration, read the `vminstaller` role on how to set that up.
 
 You probably *should* tweak the following:
 
-* Delete the `brint` interface line under `nics`. I like to run an extra
-  internal network for my VMs but unless your hypervisor is set up the same, you
-  won't need it.
+* `virtualcpus` and `ramsize` to match what your hypervisor can spare
 * `timezone`, obviously
 * Set `disks` to match the hardware of your hypervisor. Here, `/dev/md127` is my
   SSD, and the only virsh pool is called `virtimages`.
@@ -90,19 +92,25 @@ oldschool) so as not to break it if your connection should drop.
 Note that occasionally the installation may abort with an error similar to the
 following appearing on the VM's console:
 
-    Oct 29 09:54:50 in-target: Some packages could not be installed. This may mean that you have
-    Oct 29 09:54:50 in-target: requested an impossible situation or if you are using the unstable
-    Oct 29 09:54:50 in-target: distribution that some required packages have not yet been created
-    Oct 29 09:54:50 in-target: or been moved out of Incoming.
-    Oct 29 09:54:50 in-target: The following information may help to resolve the situation:
-    Oct 29 09:54:50 in-target:
-    Oct 29 09:54:50 in-target: The following packages have unmet dependencies:
-    Oct 29 09:54:50 in-target:  linux-generic : Depends: linux-image-generic (= 4.15.0.68.70) but it is not going to be installed
-    [...]
-    Oct 29 09:54:56 in-target: Setting up linux-headers-generic (4.15.0.68.70) ...^M
-    Oct 29 09:54:57 base-installer: error: exiting on error base-installer/kernel/failed-install
-    Oct 29 09:55:39 main-menu[3869]: WARNING **: Configuring 'bootstrap-base' failed with error code 1
-    Oct 29 09:55:39 main-menu[3869]: WARNING **: Menu item 'bootstrap-base' failed.
+    in-target: Some packages could not be installed. This may mean that you have
+    in-target: requested an impossible situation or if you are using the unstable
+    in-target: distribution that some required packages have not yet been created
+    in-target: or been moved out of Incoming.
+    in-target: The following information may help to resolve the situation:
+    in-target:
+    in-target: The following packages have unmet dependencies:
+    in-target:  linux-generic : Depends: linux-image-generic (= 4.15.0.68.70) but it is not going to be installed
+
+    in-target: Setting up linux-headers-generic (4.15.0.68.70) ...^M
+    base-installer: error: exiting on error base-installer/kernel/failed-install
+    main-menu[3869]: WARNING **: Configuring 'bootstrap-base' failed with error code 1
+    main-menu[3869]: WARNING **: Menu item 'bootstrap-base' failed.
 
 This is not a problem of the installer but of inconsistent information on the
 Ubuntu mirrors. Simply wait for the mirror to fully synchronize and retry.
+
+## TODO
+
+* Add jobs for timely updates
+* Support more map styles
+* Vector tiles

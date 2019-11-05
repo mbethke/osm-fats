@@ -1,4 +1,4 @@
-- hosts: osm.towiski.de
+- hosts: $MY_TILE_SERVER
   remote_user: ansible
   become: yes
   become_user: root
@@ -9,7 +9,7 @@
     - osm
   vars:
     ansible_port: 22
-    hyper: hv2.towiski.de
+    hyper: $MY_HYPERVISOR
     distro: ubuntu1804
     machinearch: x86_64
     vmwaittime: 20
@@ -22,12 +22,21 @@
     keyboard: us
     timezone: Europe/Berlin
     nics:
-      - { type: bridge , name: brpub , device: eth0 , model: virtio-net , onboot: yes , bootproto: static , ip: '95.216.246.231' , netmask: '255.255.255.192' , gateway: '95.216.246.193' , nameserver: '213.133.98.98' , mac: '00:50:56:00:0B:CB' }
-      - { type: bridge , name: brint , device: eth1 , model: virtio-net , onboot: yes , bootproto: dhcp , gateway: 'fd5d:3644:b0fe::1' , nameserver: 'fd5d:3644:b0fe::1' }
+      - name: brpub
+        ip: '$MY_IP'
+        netmask: '$MY_NETMASK'
+        gateway: '$MY_GATEWAY'
+        nameserver: '$MY_NAMESERVER'
+        mac: '$MY_MAC'
+        type: bridge
+        device: eth0
+        model: virtio-net
+        onboot: yes
+        bootproto: static
     preseednic: eth0
     iscsinic: ''
-    hostname: osm
-    domainname: towiski.de
+    hostname: $MY_HOSTNAME
+    domainname: $MY_DOMAIN
     virtualfilespath: 
     disks:
       - { name: vda , pool: virtimages , size: 200G }
