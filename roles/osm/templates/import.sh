@@ -7,7 +7,7 @@ if [ $# -lt 1 ]; then
     exit 1
 fi
 
-cd /etc/mapnik-osm-data/carto
+cd /etc/mapnik-osm-data/carto-de
 for f in "$@"; do
     flatnodes=''
     [[ "$f" =~ .*/planet-.* ]] && flatnodes="--flat-nodes /var/tmp/flatnodes"
@@ -18,4 +18,12 @@ for f in "$@"; do
         $flatnodes "$f"
 done
 
-test -e ~/post-import.sh && ~/post-import.sh
+echo "Running post-import scripts"
+for script in ~/post-import.d/*; do
+    test -x "$script" || {
+        echo >&2 "BUG: $script is not executable"
+            continue
+        }
+    echo "${script#*/}"
+    $script
+done
