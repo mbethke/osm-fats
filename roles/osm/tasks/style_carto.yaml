@@ -11,7 +11,7 @@
     creates: "/etc/mapnik-osm-data/{{ style.name }}/data/antarctica-icesheet-outlines-*/icesheet_outlines.shp"
 
 - name: patch style.mml with database credentials
-  shell: "cd /etc/mapnik-osm-data/{{ style.name }} && mv project.mml project.mml.orig && perl -MYAML::XS=LoadFile,DumpFile -e'$d=LoadFile(q(project.mml.orig));@{$d->{_parts}{osm2pgsql}}{qw(host dbname user password)}=@ARGV;DumpFile(q(project.mml),$d)' localhost {{ gis_dbname }} {{ osm_username }} {{ db_password }}"
+  shell: "cd /etc/mapnik-osm-data/{{ style.name }} && mv project.mml project.mml.orig && perl -MYAML::XS=LoadFile,DumpFile -e'$d=LoadFile(q(project.mml.orig));@{$d->{_parts}{osm2pgsql}}{qw(host dbname user password)}=@ARGV;DumpFile(q(project.mml),$d)' localhost {{ gis_dbname }} {{ osm_username }} {{ osm_psql_password }}"
 
 - name: copy Makefile
   copy:

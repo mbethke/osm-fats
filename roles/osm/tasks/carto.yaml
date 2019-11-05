@@ -9,6 +9,14 @@
     state: directory
     mode: '755'
 
+- name: make post-import dir
+  file:
+    dest: ~/post-import.d
+    state: directory
+    mode: '755'
+  become: yes
+  become_user: "{{ osm_username }}"
+
 - include: "style_{{ style.name }}.yaml"
   with_items: "{{ styles }}"
   loop_control:

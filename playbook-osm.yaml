@@ -2,10 +2,10 @@
   remote_user: ansible
   become: yes
   become_user: root
-  #gather_facts: no
+  gather_facts: no
   roles:
-    #- vminstaller
-    #- linux
+    - vminstaller
+    - linux
     - osm
   vars:
     ansible_port: 22
@@ -14,7 +14,7 @@
     machinearch: x86_64
     vmwaittime: 20
     virtualcpus: 6
-    ramsize: 32768
+    ramsize: 49152
     sshdrsakeylength: 4096
     sshdecdsakeylength: 521
     language: en_US
@@ -22,7 +22,6 @@
     keyboard: us
     timezone: Europe/Berlin
     nics:
-      #- { type: bridge , name: brpub , device: eth0 , model: virtio-net , onboot: yes , bootproto: static , ip: '2a01:4f9:2b:2921:7::2' , netmask: 'ffff:ffff:ffff:ffff::' , gateway: 'fe80::1' , nameserver: '2a01:4f8:0:1::add:9999' , mac: '00:50:56:00:0B:CB' }
       - { type: bridge , name: brpub , device: eth0 , model: virtio-net , onboot: yes , bootproto: static , ip: '95.216.246.231' , netmask: '255.255.255.192' , gateway: '95.216.246.193' , nameserver: '213.133.98.98' , mac: '00:50:56:00:0B:CB' }
       - { type: bridge , name: brint , device: eth1 , model: virtio-net , onboot: yes , bootproto: dhcp , gateway: 'fd5d:3644:b0fe::1' , nameserver: 'fd5d:3644:b0fe::1' }
     preseednic: eth0
@@ -40,13 +39,12 @@
     sshpubkey: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
     gis_dbname: gis
     osm_username: osm
+    osm_psql_password: preferablyalongandrandompassword
     website: "{{ ansible_host }}"
     styles:
       - name: carto-de
-        #version: 'v4.23.0'
-        #version: 'v4.23.0-split'
+        #version: 'v4.23.0-split' -- currently broken, just use HEAD
         default_language: en
-        test: yes
       - name: carto
         version: 'v4.23.0'
     download_planet: no
@@ -54,11 +52,11 @@
     planet_url: 'https://download.bbbike.org/osm/planet/planet-latest.osm.pbf'
     use_postgresql_11: no
     psql_tuning:
-      shared_buffers: 8GB
+      shared_buffers: 12GB
       checkpoint_timeout: 1h
       checkpoint_completion_target: 0.8
       checkpoint_flush_after: 256
-      effective_cache_size: 12GB
+      effective_cache_size: 24GB
       maintenance_work_mem: 2GB
       work_mem: 128MB
       wal_buffers: 16MB
@@ -73,5 +71,5 @@
       autovacuum_max_workers: 1
       autovacuum_naptime: 30min
     renderd_tuning:
-      threads: 4
+      threads: 6
       tiledir: /var/lib/mod_tile

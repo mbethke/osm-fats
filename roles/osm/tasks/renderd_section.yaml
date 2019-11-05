@@ -6,5 +6,6 @@
     value: "{{ item.value }}"
     mode: '0644'
     backup: no
+    no_extra_spaces: yes
   loop: "{{ params | dict2items }}"
   notify: restart_renderd
