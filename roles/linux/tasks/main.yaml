@@ -54,7 +54,7 @@
     state: absent
 
 - name: Configure apticron
-  copy:
+  template:
     src: apticron.conf
     dest: /etc/apticron
     mode: 0640
